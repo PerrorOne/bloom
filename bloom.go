@@ -1,13 +1,14 @@
 package bloom
 
 import (
+	"github.com/spf13/cast"
 	"hash/fnv"
 	"math"
 )
 
 type BitSetProvider interface {
-	Set([]uint) error
-	Test([]uint) (bool, error)
+	Set([]int64) error
+	Test([]int64) (bool, error)
 }
 
 type BloomFilter struct {
@@ -49,8 +50,8 @@ func (f *BloomFilter) Exists(data []byte) (bool, error) {
 	return true, nil
 }
 
-func (f *BloomFilter) getLocations(data []byte) []uint {
-	locations := make([]uint, f.k)
+func (f *BloomFilter) getLocations(data []byte) []int64 {
+	locations := make([]int64, f.k)
 	hasher := fnv.New64()
 	hasher.Write(data)
 	a := make([]byte, 1)
@@ -58,7 +59,7 @@ func (f *BloomFilter) getLocations(data []byte) []uint {
 		a[0] = byte(i)
 		hasher.Write(a)
 		hashValue := hasher.Sum64()
-		locations[i] = uint(hashValue % uint64(f.m))
+		locations[i] = cast.ToInt64(hashValue % uint64(f.m))
 	}
 	return locations
 }

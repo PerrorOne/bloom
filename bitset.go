@@ -1,27 +1,27 @@
 package bloom
 
 import (
-	"github.com/willf/bitset"
+	"github.com/bits-and-blooms/bitset"
 )
 
 type BitSet struct {
 	bitSet *bitset.BitSet
 }
 
-func NewBitSet(m uint) *BitSet {
-	return &BitSet{bitSet: bitset.New(m)}
+func NewBitSet(m int64) *BitSet {
+	return &BitSet{bitSet: bitset.New(uint(m))}
 }
 
-func (b *BitSet) Set(offsets []uint) error {
+func (b *BitSet) Set(offsets []int64) error {
 	for _, offset := range offsets {
-		b.bitSet.Set(offset)
+		b.bitSet.Set(uint(offset))
 	}
 	return nil
 }
 
-func (b *BitSet) Test(offsets []uint) (bool, error) {
+func (b *BitSet) Test(offsets []int64) (bool, error) {
 	for _, offset := range offsets {
-		if !b.bitSet.Test(offset) {
+		if !b.bitSet.Test(uint(offset)) {
 			return false, nil
 		}
 	}

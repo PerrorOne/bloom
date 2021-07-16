@@ -1,12 +1,12 @@
 package bloom_test
 
 import (
+	"bloom"
 	"testing"
 	"time"
 
 	"encoding/binary"
 	"github.com/alicebob/miniredis"
-	"github.com/bculberson/bloom"
 	"github.com/garyburd/redigo/redis"
 )
 
@@ -26,14 +26,14 @@ func TestRedisBloomFilter(t *testing.T) {
 	defer conn.Close()
 
 	m, k := bloom.EstimateParameters(1000, .01)
-	bitSet := bloom.NewRedisBitSet("test_key", m, conn)
+	bitSet := bloom.NewRedisBitSet("test_key", m, &MockR{conn: conn})
 	b := bloom.New(m, k, bitSet)
 	testBloomFilter(t, b)
 }
 
 func TestBloomFilter(t *testing.T) {
 	m, k := bloom.EstimateParameters(1000, .01)
-	b := bloom.New(m, k, bloom.NewBitSet(m))
+	b := bloom.New(m, k, bloom.NewBitSet(int64(m)))
 	testBloomFilter(t, b)
 }
 
@@ -41,7 +41,7 @@ func TestCollision(t *testing.T) {
 	n := uint(10000)
 	fp := .01
 	m, k := bloom.EstimateParameters(n, fp)
-	b := bloom.New(m, k, bloom.NewBitSet(m))
+	b := bloom.New(m, k, bloom.NewBitSet(int64(m)))
 	shouldNotExist := 0
 	for i := uint(0); i < n; i++ {
 		data := make([]byte, 4)
